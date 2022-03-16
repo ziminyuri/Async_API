@@ -24,6 +24,7 @@ async def startup():
     redis.redis = await aioredis.from_url(f'{config.REDIS_HOST}:{config.REDIS_PORT}')
     elastic.es = AsyncElasticsearch(f'{config.ELASTIC_HOST}:{config.ELASTIC_PORT}')
 
+
 @app.on_event('shutdown')
 async def shutdown():
     await redis.redis.close()

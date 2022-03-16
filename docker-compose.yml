@@ -24,14 +24,18 @@ services:
   web:
     build: .
     container_name: web-api
-    ports:
-      - '80:80'
     volumes:
       - ./src/:/usr/src/app/
     env_file:
       - .env.prod
     depends_on:
       - elasticsearch
+  nginx:
+    build: ./nginx
+    ports:
+      - '8000:80'
+    depends_on:
+      - web
 
 volumes:
   redis-data:
@@ -40,4 +44,3 @@ volumes:
   elasticsearch-data:
     external: true
     name: elasticsearch-data
-

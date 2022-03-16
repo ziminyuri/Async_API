@@ -1,8 +1,8 @@
 import os
+from logging import config as logging_config
 
 from dotenv import load_dotenv
 
-from logging import config as logging_config
 from core.logger import LOGGING
 
 load_dotenv()

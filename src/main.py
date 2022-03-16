@@ -6,11 +6,10 @@ from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
+from api.v1 import film
 from core import config
 from core.logger import LOGGING
-from db import elastic
-from db import redis
-from api.v1 import film
+from db import elastic, redis
 
 app = FastAPI(
     title=config.PROJECT_NAME,
@@ -24,7 +23,6 @@ app = FastAPI(
 async def startup():
     redis.redis = await aioredis.from_url(f'{config.REDIS_HOST}:{config.REDIS_PORT}')
     elastic.es = AsyncElasticsearch(f'{config.ELASTIC_HOST}:{config.ELASTIC_PORT}')
-
 
 @app.on_event('shutdown')
 async def shutdown():

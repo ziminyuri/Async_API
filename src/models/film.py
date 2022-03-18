@@ -6,17 +6,23 @@ from pydantic import BaseModel
 from helpers import orjson_dumps
 
 
+class InnerModel(BaseModel):
+    id: str
+    name: str
+
+
 class Film(BaseModel):
     id: str
     imdb_rating: Optional[str]
-    genre: List[str] = []
+    genres: List[InnerModel] = []
     title: str
     description: Optional[str]
-    director: List[str] = []
+    directors_names: List[str] = []
     actors_names: List[str] = []
     writers_names: List[str] = []
-    actors: List[dict] = []
-    writers: List[dict] = []
+    directors: List[InnerModel] = []
+    actors: List[InnerModel] = []
+    writers: List[InnerModel] = []
 
     class Config:
         json_loads = orjson.loads

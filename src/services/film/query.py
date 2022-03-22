@@ -10,3 +10,22 @@ def film_search_query(query):
                 }
             }]
         }}
+
+
+def films_query(genre=None):
+    if genre:
+        return {
+            "nested": {
+                "path": "genres",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {"match": {"genres.id": genre}}
+                        ]
+                    }
+                }
+            }
+        }
+    return {
+        "match_all": {}
+    }

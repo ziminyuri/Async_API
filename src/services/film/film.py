@@ -9,7 +9,8 @@ from fastapi import Depends
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.film import Film, Films
-from services.film.query import film_search_query
+from services.film.query import film_search_query, films_query
+from src.helpers import get_hash
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
@@ -22,25 +23,38 @@ class FilmService:
         self.elastic = elastic
 
     async def get_by_id(self, film_id: str) -> Optional[Film]:
-        film = await self._film_from_cache(film_id)
+        hash_ = get_hash(film_id)
+        film = await self._film_from_cache(hash_)
 
         if not film:
             film = await self._get_film(film_id)
             if not film:
                 return None
-            await self._put_film_to_cache(film.id, film.json())
+            await self._put_film_to_cache(hash_, film.json())
 
         return film
 
     async def get_by_query(self, query: str, page: int, size: int) -> Optional[Film]:
-        cache_identifier = f"{query}:{page}:{size}"
-        films = await self._film_from_cache(cache_identifier, many=True)
+        hash_ = get_hash(query, page, size)
+        films = await self._film_from_cache(hash_, many=True)
 
         if not films:
             films = await self._get_films_by_query(query, page, size)
             if not films:
                 return None
-            await self._put_film_to_cache(cache_identifier, films.json())
+            await self._put_film_to_cache(hash_, films.json())
+
+        return films
+
+    async def get_films(self, sort: str | None, genre: str | None, page: int, size: int):
+        hash_ = get_hash(sort, genre, page, size)
+        films = await self._film_from_cache(hash_, many=True)
+
+        if not films:
+            films = await self._get_films(sort, genre, page, size)
+            if not films:
+                return None
+            await self._put_film_to_cache(hash_, films.json())
 
         return films
 
@@ -57,6 +71,17 @@ class FilmService:
                                             query=film_search_query(query),
                                             from_=self._get_offset(page, size),
                                             size=size)
+        except NotFoundError:
+            return None
+        return Films.parse_obj(self.parse_es_response(doc))
+
+    async def _get_films(self, sort: str | None, genre: str | None, page: int, size: int):
+        try:
+            doc = await self.elastic.search(index=self.INDEX,
+                                            query=films_query(genre),
+                                            from_=self._get_offset(page, size),
+                                            size=size,
+                                            sort=sort)
         except NotFoundError:
             return None
         return Films.parse_obj(self.parse_es_response(doc))

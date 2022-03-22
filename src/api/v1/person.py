@@ -19,6 +19,7 @@ router = APIRouter()
 async def persons_list(
     request: Request, person_service: PersonService = Depends(get_person_service)
 ) -> list[Person]:
+
     params = get_params(request)
     person_list = await person_service.get_by_params(**params)
     if not person_list:
@@ -35,7 +36,11 @@ async def persons_list(
 
 
 @router.get('/{person_id}', response_model=Person)
-async def person_details(person_id: str, person_service: PersonService = Depends(get_person_service)) -> Person:
+async def person_details(
+        person_id: str,
+        person_service: PersonService = Depends(get_person_service)
+        ) -> Person:
+
     person = await person_service.get_by_id(person_id)
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')

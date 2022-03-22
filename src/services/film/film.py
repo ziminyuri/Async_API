@@ -34,7 +34,7 @@ class FilmService:
 
         return film
 
-    async def get_by_query(self, query: str, page: int, size: int) -> Optional[Film]:
+    async def get_by_query(self, query: str, page: int, size: int) -> Optional[Films]:
         hash_ = get_hash(query, page, size)
         films = await self._film_from_cache(hash_, many=True)
 
@@ -46,7 +46,8 @@ class FilmService:
 
         return films
 
-    async def get_films(self, sort: str | None, genre: str | None, page: int, size: int):
+    async def get_films(self, sort: str | None, genre: str | None,
+                        page: int, size: int) -> Optional[Films]:
         hash_ = get_hash(sort, genre, page, size)
         films = await self._film_from_cache(hash_, many=True)
 
@@ -65,7 +66,7 @@ class FilmService:
             return None
         return Film(**doc['_source'])
 
-    async def _get_films_by_query(self, query: str, page: int, size: int):
+    async def _get_films_by_query(self, query: str, page: int, size: int) -> Optional[Films]:
         try:
             doc = await self.elastic.search(index=self.INDEX,
                                             query=film_search_query(query),
@@ -75,7 +76,8 @@ class FilmService:
             return None
         return Films.parse_obj(self.parse_es_response(doc))
 
-    async def _get_films(self, sort: str | None, genre: str | None, page: int, size: int):
+    async def _get_films(self, sort: str | None, genre: str | None,
+                         page: int, size: int) -> Optional[Films]:
         try:
             doc = await self.elastic.search(index=self.INDEX,
                                             query=films_query(genre),

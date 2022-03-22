@@ -27,3 +27,7 @@ class Film(BaseModel):
     class Config:
         json_loads = orjson.loads
         json_dumps = orjson_dumps
+
+
+class Films(BaseModel):
+    __root__: List[Film]

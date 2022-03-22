@@ -2,9 +2,9 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from services.person import PersonService, get_person_service
-from services.utils import get_params
+from helpers import get_params
 from models.person import Person
+from services.person import PersonService, get_person_service
 
 router = APIRouter()
 

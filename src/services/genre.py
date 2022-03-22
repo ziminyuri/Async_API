@@ -6,17 +6,17 @@ from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-from models.person import Person
+from models.genre import Genre
 from services.base import BaseService
 
 
-class PersonService(BaseService):
+class GenreService(BaseService):
     pass
 
 
 @lru_cache()
-def get_person_service(
+def get_genre_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
-) -> PersonService:
-    return PersonService(redis=redis, elastic=elastic, model=Person, index='persons')
+) -> GenreService:
+    return GenreService(redis=redis, elastic=elastic, model=Genre, index='genres')

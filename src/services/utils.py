@@ -1,5 +1,4 @@
 from typing import Union
-
 from fastapi import Request
 
 
@@ -13,3 +12,4 @@ def get_params(request: Request) -> dict[str, Union[str, dict]]:
         params[key] = value
 
     return params
+

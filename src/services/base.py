@@ -52,3 +52,15 @@ class BaseService:
     async def _put_current_to_cache(self, key: str, current: MODELS_TYPE):
         await self.redis.set(key, current.json(), ex=CACHE_EXPIRE_IN_SECONDS)
 
+    async def get_by_params(self, **params) -> list[MODELS_TYPE]:
+        object_list = None
+        if not object_list:
+            try:
+                doc = await self.elastic.search(index=self.index)
+            except NotFoundError:
+                object_list = None
+            else:
+                object_list = [
+                    self.model(**_doc["_source"]) for _doc in doc["hits"]["hits"]
+                ]
+        return object_list

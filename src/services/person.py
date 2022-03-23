@@ -6,7 +6,7 @@ from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-from models.person import Person
+from models import Person, Persons
 from services.base import BaseService
 
 
@@ -19,4 +19,5 @@ def get_person_service(
         redis: Redis = Depends(get_redis),
         elastic: AsyncElasticsearch = Depends(get_elastic),
 ) -> PersonService:
-    return PersonService(redis=redis, elastic=elastic, model=Person, index='persons')
+    return PersonService(redis=redis, elastic=elastic,
+                         model=Person, models=Persons, index='persons')

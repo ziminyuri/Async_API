@@ -3,9 +3,12 @@ from typing import Optional, Union
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import NotFoundError
+from orjson import loads
 
+from helpers import make_query_body, orjson_dumps
 from models.film import Film
 from models.person import Person
+from redis import get_key_for_list
 
 CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
@@ -49,14 +52,34 @@ class BaseService:
         await self.redis.set(key, current.json(), ex=CACHE_EXPIRE_IN_SECONDS)
 
     async def get_by_params(self, **params) -> list[MODELS_TYPE]:
-        object_list = None
+        query_body = make_query_body(params)
+        redis_key = get_key_for_list(self.index, query_body)
+
+        object_list = await self._list_from_cache(redis_key)
         if not object_list:
             try:
-                doc = await self.elastic.search(index=self.index)
+                doc = await self.elastic.search(body=query_body, index=self.index)
             except NotFoundError:
                 object_list = None
             else:
                 object_list = [
                     self.model(**_doc["_source"]) for _doc in doc["hits"]["hits"]
                 ]
+                await self._put_list_to_cache(redis_key, object_list)
+
         return object_list
+
+    async def _list_from_cache(self, redis_key: str) -> Optional[list[MODELS_TYPE]]:
+        data = await self.redis.get(redis_key)
+        if not data:
+            return None
+
+        obj = [self.model.parse_raw(_data) for _data in loads(data)]
+        return obj
+
+    async def _put_list_to_cache(self, redis_key: str, object_list: list[MODELS_TYPE]):
+        await self.redis.set(
+            redis_key,
+            orjson_dumps(object_list, default=self.model.json),
+            ex=CACHE_EXPIRE_IN_SECONDS,
+        )

@@ -10,11 +10,14 @@ router = APIRouter()
 
 
 @router.get(
+    "/search",
+    response_model=list[Genre],
+    summary="Search genres"
+)
+@router.get(
     "",
     response_model=list[Genre],
     summary="List of genres",
-    description="List of genres",
-    response_description="List of genres with id",
 )
 async def genres_list(
     request: Request, person_service: GenreService = Depends(get_genre_service)

@@ -1,4 +1,5 @@
 from typing import Optional, Union
+import hashlib
 
 import orjson
 from fastapi import Request
@@ -44,3 +45,9 @@ def make_query_body(params):
         body['query'] = {"query_string": {"query": body_params.query}}
 
     return body
+
+
+def get_hash(*args):
+    parts = "".join([str(arg) for arg in args]).encode('UTF-8')
+    hash_ = hashlib.sha256(parts)
+    return str(hash_.hexdigest())

@@ -1,7 +1,9 @@
 from typing import List
 
+import orjson
 from pydantic import BaseModel
 
+from helpers import orjson_dumps
 from .common import InnerFilmModel
 
 
@@ -14,6 +16,10 @@ class Person(BaseModel):
     full_name: str
     roles: List[str]
     films: List[PersonFilmModel]
+
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
 
 
 class Persons(BaseModel):

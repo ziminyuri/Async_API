@@ -5,11 +5,11 @@ from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import NotFoundError
 from orjson import loads
 
+from db.redis import get_key_for_list
 from helpers import orjson_dumps
 from models.film import Film, Films
 from models.genre import Genre, Genres
 from models.person import Person, Persons
-from redis import get_key_for_list
 from services.es_parser import make_query_body
 
 CACHE_EXPIRE_IN_SECONDS = 60 * 5
@@ -47,8 +47,7 @@ class BaseService:
         if not data:
             return None
 
-        current = self.model.parse_raw(data)
-        return current
+        return self.model.parse_raw(data)
 
     async def _put_current_to_cache(self, key: str, current: MODELS_TYPE):
         await self.redis.set(key, current.json(), ex=CACHE_EXPIRE_IN_SECONDS)
@@ -56,7 +55,6 @@ class BaseService:
     async def get_by_params(self, params) -> list[MODELS_TYPE]:
         query_body = make_query_body(params)
         redis_key = get_key_for_list(self.index, query_body)
-        #
         # object_list = await self._list_from_cache(redis_key)
         object_list = None
         if not object_list:
@@ -67,9 +65,6 @@ class BaseService:
             else:
                 plural_model = self.get_plural_models()
                 object_list = plural_model.parse_obj(self.parse_es_response(doc))
-                # object_list = [
-                #     self.model(**_doc["_source"]) for _doc in doc["hits"]["hits"]
-                # ]
                 await self._put_list_to_cache(redis_key, object_list)
 
         return object_list

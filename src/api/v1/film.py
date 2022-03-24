@@ -22,7 +22,7 @@ async def get_film_details(film_id: str,
 @router.get('/search/', response_model=Films)
 async def film_search(params: FilmSearchParams = Depends(),
                       film_service: FilmService = Depends(get_film_service)) -> Films:
-    films = await film_service.get_by_query(params.query, params.page, params.size)
+    films = await film_service.get_by_params(params)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
 
@@ -32,7 +32,7 @@ async def film_search(params: FilmSearchParams = Depends(),
 @router.get('', response_model=Films)
 async def get_films(params: FilmsParams = Depends(),
                     film_service: FilmService = Depends(get_film_service)) -> Films:
-    films = await film_service.get_films(params.sort, params.genre, params.page, params.size)
+    films = await film_service.get_by_params(params)
     if not films:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='films not found')
 

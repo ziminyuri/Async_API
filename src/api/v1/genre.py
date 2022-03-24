@@ -10,11 +10,6 @@ router = APIRouter()
 
 
 @router.get(
-    "/search",
-    response_model=Genres,
-    summary="Search genres"
-)
-@router.get(
     "",
     response_model=Genres,
     summary="List of genres",

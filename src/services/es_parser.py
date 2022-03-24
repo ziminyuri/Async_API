@@ -20,7 +20,7 @@ def make_query_body(params: Optional[PARAMS_TYPE]) -> dict:
 
 
 def _get_sort(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
-    if params is BaseParams:
+    if isinstance(params, BaseParams | FilmsParams):
         if params.sort:
             field = params.sort.removeprefix("-")
             direction = "desc" if params.sort.startswith("-") else "asc"
@@ -30,11 +30,11 @@ def _get_sort(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
 
 def _get_query(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
     """ Получение поискового запроса """
-    if params is BaseParams:
+    if isinstance(params, BaseParams):
         if params.query:
             body['query'] = {"query_string": {"query": params.query}}
 
-    elif params is FilmSearchParams:
+    elif isinstance(params, FilmSearchParams):
         if params.query:
             body['query'] = {
                 "bool": {
@@ -53,7 +53,7 @@ def _get_query(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
 def _get_genre(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
     """ Соритровака по жанрам для фильмов"""
 
-    if params is FilmsParams:
+    if isinstance(params, FilmsParams):
         if params.genre:
             body['query'] = {
                 "nested": {

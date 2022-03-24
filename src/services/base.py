@@ -5,8 +5,8 @@ from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import NotFoundError
 
 from db.redis import get_key_for_list
-from services.es_parser import make_query_body, PARAMS_TYPE
 from models import Film, Films, Genre, Genres, Person, Persons
+from services.es_parser import PARAMS_TYPE, make_query_body
 
 CACHE_EXPIRE_IN_SECONDS = 60 * 5
 

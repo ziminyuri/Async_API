@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 
-from helpers import get_params
-from models.genre import Genre
+from api.v1.query_params import BaseParams
+from models.genre import Genre, Genres
 from services.genre import GenreService, get_genre_service
 
 router = APIRouter()
@@ -11,30 +11,23 @@ router = APIRouter()
 
 @router.get(
     "/search",
-    response_model=list[Genre],
+    response_model=Genres,
     summary="Search genres"
 )
 @router.get(
     "",
-    response_model=list[Genre],
+    response_model=Genres,
     summary="List of genres",
 )
 async def genres_list(
-    request: Request, person_service: GenreService = Depends(get_genre_service)
-) -> list[Genre]:
+        params: BaseParams = Depends(),
+        genres_service: GenreService = Depends(get_genre_service)
+) -> Genres:
 
-    params = get_params(request)
-    genre_list = await person_service.get_by_params(**params)
+    genre_list = await genres_service.get_by_params(params)
     if not genre_list:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="genre not found")
-    return [
-        Genre(
-            id=genre.id,
-            name=genre.name,
-            films=genre.films,
-        )
-        for genre in genre_list
-    ]
+    return Genres.parse_obj(genre_list.__root__)
 
 
 @router.get('/{genre_id}', response_model=Genre)

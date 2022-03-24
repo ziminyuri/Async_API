@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 
 from api.v1.query_params import FilmSearchParams, FilmsParams
-from api.v1.serializers import FilmDetail, Films
+from serializers.film import FilmDetail, Films
 from services.film import FilmService, get_film_service
 
 router = APIRouter()

@@ -14,3 +14,7 @@ class Person(BaseModel):
     full_name: str
     roles: List[str]
     films: List[PersonFilmModel]
+
+
+class Persons(BaseModel):
+    __root__: List[Person]

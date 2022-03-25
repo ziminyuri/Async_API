@@ -23,3 +23,6 @@
 ## CI-CD
 
 В GitHub actions настроен запуск линтера и тестов при событии push.
+
+## ETL
+Актуальный проект ETL можно посмотреть по [ссылке](https://github.com/vokh-dima/new_admin_panel_sprint_3 "ссылка")

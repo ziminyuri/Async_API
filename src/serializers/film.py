@@ -1,19 +1,20 @@
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
+from models.common import BaseOrjsonModel
 
 
-class FilmGenre(BaseModel):
+class FilmGenre(BaseOrjsonModel):
     id: str
     name: str
 
 
-class FilmPerson(BaseModel):
+class FilmPerson(BaseOrjsonModel):
     id: str
     full_name: str = Field('', alias='name')
 
 
-class FilmDetail(BaseModel):
+class FilmDetail(BaseOrjsonModel):
     id: str
     title: str
     imdb_rating: Optional[float]
@@ -24,7 +25,7 @@ class FilmDetail(BaseModel):
     directors: List[FilmPerson]
 
 
-class Film(BaseModel):
+class Film(BaseOrjsonModel):
     id: str
     title: str
     imdb_rating: Optional[float]

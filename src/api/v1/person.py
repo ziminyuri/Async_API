@@ -10,14 +10,14 @@ router = APIRouter()
 
 
 @router.get(
-    "/search",
+    '/search',
     response_model=Persons,
-    summary="Search person"
+    summary='Search person'
 )
 @router.get(
-    "",
+    '',
     response_model=Persons,
-    summary="List of person",
+    summary='List of person',
 )
 async def persons_list(
         params: BaseParams = Depends(),
@@ -26,7 +26,7 @@ async def persons_list(
 
     person_list = await person_service.get_by_params(params)
     if not person_list:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="PERSON_NOT_FOUND")
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='PERSON_NOT_FOUND')
     return Persons.parse_obj(person_list.__root__)
 
 

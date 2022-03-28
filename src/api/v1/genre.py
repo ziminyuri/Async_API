@@ -10,9 +10,9 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    '',
     response_model=Genres,
-    summary="List of genres",
+    summary='List of genres',
 )
 async def genres_list(
         params: BaseParams = Depends(),
@@ -21,7 +21,7 @@ async def genres_list(
 
     genre_list = await genres_service.get_by_params(params)
     if not genre_list:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="genre not found")
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='genre not found')
     return Genres.parse_obj(genre_list.__root__)
 
 

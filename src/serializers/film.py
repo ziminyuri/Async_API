@@ -10,7 +10,7 @@ class FilmGenre(BaseModel):
 
 class FilmPerson(BaseModel):
     id: str
-    full_name: str = Field("", alias='name')
+    full_name: str = Field('', alias='name')
 
 
 class FilmDetail(BaseModel):

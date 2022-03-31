@@ -1,21 +1,14 @@
 from typing import List
 
-import orjson
 from pydantic import BaseModel
 
-from helpers import orjson_dumps
-
-from .common import InnerFilmModel
+from .common import BaseOrjsonModel, InnerFilmModel
 
 
-class Genre(BaseModel):
+class Genre(BaseOrjsonModel):
     id: str
     name: str
     films: List[InnerFilmModel] = []
-
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
 
 
 class Genres(BaseModel):

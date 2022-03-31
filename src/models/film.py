@@ -1,17 +1,16 @@
 from typing import List, Optional
 
-import orjson
 from pydantic import BaseModel
 
-from helpers import orjson_dumps
+from .common import BaseOrjsonModel
 
 
-class InnerModel(BaseModel):
+class InnerModel(BaseOrjsonModel):
     id: str
     name: str
 
 
-class Film(BaseModel):
+class Film(BaseOrjsonModel):
     id: str
     imdb_rating: Optional[str]
     genres: List[InnerModel] = []
@@ -23,10 +22,6 @@ class Film(BaseModel):
     directors: List[InnerModel] = []
     actors: List[InnerModel] = []
     writers: List[InnerModel] = []
-
-    class Config:
-        json_loads = orjson.loads
-        json_dumps = orjson_dumps
 
 
 class Films(BaseModel):

@@ -5,19 +5,20 @@ from fastapi import APIRouter, Depends, HTTPException
 from api.v1.query_params import BaseParams
 from models.person import Person, Persons
 from services.person import PersonService, get_person_service
+from dictionary import errors_dict
 
 router = APIRouter()
 
 
 @router.get(
-    "/search",
+    '/search',
     response_model=Persons,
-    summary="Search person"
+    summary='Search person'
 )
 @router.get(
-    "",
+    '',
     response_model=Persons,
-    summary="List of person",
+    summary='List of person',
 )
 async def persons_list(
         params: BaseParams = Depends(),
@@ -26,7 +27,7 @@ async def persons_list(
 
     person_list = await person_service.get_by_params(params)
     if not person_list:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="PERSON_NOT_FOUND")
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=errors_dict['404_persons'])
     return Persons.parse_obj(person_list.__root__)
 
 
@@ -38,6 +39,6 @@ async def person_details(
 
     person = await person_service.get_by_id(person_id)
     if not person:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=errors_dict['404_person'])
 
     return Person(**person.dict())

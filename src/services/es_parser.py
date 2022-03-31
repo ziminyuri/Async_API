@@ -22,9 +22,9 @@ def make_query_body(params: Optional[PARAMS_TYPE]) -> dict:
 def _get_sort(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
     if isinstance(params, BaseParams | FilmsParams):
         if params.sort:
-            field = params.sort.removeprefix("-")
-            direction = "desc" if params.sort.startswith("-") else "asc"
-            body["sort"] = {field: {"order": direction}}
+            field = params.sort.removeprefix('-')
+            direction = 'desc' if params.sort.startswith('-') else 'asc'
+            body['sort'] = {field: {'order': direction}}
     return body
 
 
@@ -32,18 +32,18 @@ def _get_query(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
     """ Получение поискового запроса """
     if isinstance(params, BaseParams):
         if params.query:
-            body['query'] = {"query_string": {"query": params.query}}
+            body['query'] = {'query_string': {'query': params.query}}
 
     elif isinstance(params, FilmSearchParams):
         if params.query:
             body['query'] = {
-                "bool": {
-                    "should": [{
-                        "match": {
-                            "title": params.query
+                'bool': {
+                    'should': [{
+                        'match': {
+                            'title': params.query
                         },
-                        "match": {
-                            "description": params.query
+                        'match': {
+                            'description': params.query
                         }
                     }]
                 }}
@@ -56,12 +56,12 @@ def _get_genre(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
     if isinstance(params, FilmsParams):
         if params.genre:
             body['query'] = {
-                "nested": {
-                    "path": "genres",
-                    "query": {
-                        "bool": {
-                            "must": [
-                                {"match": {"genres.id": params.genre}}
+                'nested': {
+                    'path': 'genres',
+                    'query': {
+                        'bool': {
+                            'must': [
+                                {'match': {'genres.id': params.genre}}
                             ]
                         }
                     }

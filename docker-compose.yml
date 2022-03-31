@@ -6,9 +6,11 @@ services:
     image: redis:6.2-alpine
     restart: always
     ports:
-      - '6379:6379'
+      - '6379'
     volumes:
       - redis-data:/data
+    expose:
+      - 6379
   elasticsearch:
     container_name: asynces
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
@@ -18,9 +20,11 @@ services:
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     ports:
-      - '9200:9200'
+      - '9200'
     depends_on:
       - redis
+    expose:
+      - 9200
   web:
     build: .
     container_name: web-api

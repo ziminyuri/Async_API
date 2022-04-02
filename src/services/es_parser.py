@@ -20,10 +20,12 @@ def make_query_body(params: Optional[PARAMS_TYPE]) -> dict:
 
 
 def _get_sort(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
-    if isinstance(params, BaseParams | FilmsParams):
+    if not isinstance(params, FilmSearchParams):
         if params.sort:
             field = params.sort.removeprefix('-')
             direction = 'desc' if params.sort.startswith('-') else 'asc'
+            if isinstance(params, BaseParams):
+                field = f"{field}.raw"
             body['sort'] = {field: {'order': direction}}
     return body
 
@@ -38,14 +40,19 @@ def _get_query(body: dict, params: Optional[PARAMS_TYPE]) -> dict:
         if params.query:
             body['query'] = {
                 'bool': {
-                    'should': [{
-                        'match': {
-                            'title': params.query
+                    'should': [
+                        {
+                            'match': {
+                                'title': params.query
+                            }
                         },
-                        'match': {
-                            'description': params.query
+                        {
+                            'match': {
+                                'description': params.query
+                            }
                         }
-                    }]
+                    ],
+                    "minimum_should_match": 1
                 }}
     return body
 

@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  redis:
+    container_name: test-aioredis
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+  elasticsearch:
+    container_name: test-asynces
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    ports:
+      - '9200:9200'
+    depends_on:
+      - redis

@@ -3,9 +3,9 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 
 from api.v1.query_params import FilmSearchParams, FilmsParams
+from dictionary import errors_dict
 from serializers.film import FilmDetail, Films
 from services.film import FilmService, get_film_service
-from dictionary import errors_dict
 
 router = APIRouter()
 
@@ -24,7 +24,7 @@ async def get_film_details(film_id: str,
 async def film_search(params: FilmSearchParams = Depends(),
                       film_service: FilmService = Depends(get_film_service)) -> Films:
     films = await film_service.get_by_params(params)
-    if not films:
+    if not (films and films.__root__):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=errors_dict['404_films'])
 
     return Films.parse_obj(films.__root__)
@@ -34,7 +34,7 @@ async def film_search(params: FilmSearchParams = Depends(),
 async def get_films(params: FilmsParams = Depends(),
                     film_service: FilmService = Depends(get_film_service)) -> Films:
     films = await film_service.get_by_params(params)
-    if not films:
+    if not (films and films.__root__):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=errors_dict['404_films'])
 
     return Films.parse_obj(films.__root__)

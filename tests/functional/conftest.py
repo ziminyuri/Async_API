@@ -10,6 +10,7 @@ from elasticsearch import AsyncElasticsearch
 from .settings import API_VERSION, SERVICE_URL, TestSettings
 from .testdata.constants import EsIndexes
 from .testdata.films import FILM_INDEX, FILMS
+from .testdata.genres import GENRE_INDEX, GENRES
 from .testdata.persons import PERSON_INDEX, PERSONS
 from .utils import HTTPResponse, populate_es
 
@@ -33,6 +34,7 @@ async def es_client(settings):
     client = AsyncElasticsearch(hosts=settings.es_host)
     await populate_es(client, EsIndexes.movies.value, FILM_INDEX, FILMS)
     await populate_es(client, EsIndexes.persons.value, PERSON_INDEX, PERSONS)
+    await populate_es(client, EsIndexes.genres.value, GENRE_INDEX, GENRES)
     yield client
     for index in EsIndexes:
         await client.indices.delete(index=index.value, ignore=[400, 404])
@@ -63,7 +65,7 @@ async def session():
     await session.close()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def make_get_request(session):
     """Делаем запрос к серверу"""
     async def inner(method: str, params: Optional[dict] = None) -> HTTPResponse:

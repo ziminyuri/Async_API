@@ -11,5 +11,5 @@ async def get_redis() -> Redis:
 
 
 def get_key_for_list(index, params):
-    key = f'{index}:{params}'.encode('utf-8')
-    return str(sha256(key).hexdigest())
+    key = f'{params}'.encode('utf-8')
+    return f'{index}_{str(sha256(key).hexdigest())}'

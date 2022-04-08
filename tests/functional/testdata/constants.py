@@ -10,3 +10,5 @@ class EsIndexes(Enum):
 FILMS_ENDPOINT = 'films'
 
 PERSON_ENDPOINT = 'persons'
+
+GENRE_ENDPOINT = 'genres'

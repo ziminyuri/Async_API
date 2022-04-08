@@ -3,9 +3,9 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException
 
 from api.v1.query_params import BaseParams
+from dictionary import errors_dict
 from models.genre import Genre, Genres
 from services.genre import GenreService, get_genre_service
-from dictionary import errors_dict
 
 router = APIRouter()
 

@@ -1,12 +1,12 @@
 from typing import Optional, Union
 
 from aioredis import Redis
-from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import NotFoundError
 
+from db.base import AbstractRepository
 from db.redis import get_key_for_list
 from models import Film, Films, Genre, Genres, Person, Persons
-from services.es_parser import PARAMS_TYPE, make_query_body
+from services.es_parser import PARAMS_TYPE
 
 CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
@@ -15,10 +15,10 @@ MODELS_TYPE = Union[Films, Persons, Genres]
 
 
 class BaseService:
-    def __init__(self, redis: Redis, elastic: AsyncElasticsearch,
+    def __init__(self, redis: Redis, db: AbstractRepository,
                  model: MODEL_TYPE, models: MODELS_TYPE, index: str):
         self.redis = redis
-        self.elastic = elastic
+        self.db = db
         self.model = model
         self.models = models
         self.index = index
@@ -28,7 +28,7 @@ class BaseService:
         data = await self._data_from_cache(hash_)
 
         if not data:
-            data = await self._get_doc_from_elastic(id_)
+            data = await self._get_from_db(id_)
             if not data:
                 return None
             await self._put_data_to_cache(hash_, data)
@@ -36,28 +36,27 @@ class BaseService:
         return data
 
     async def get_by_params(self, params: PARAMS_TYPE) -> Optional[MODELS_TYPE]:
-        query_body = make_query_body(params)
         hash_ = get_key_for_list(self.index, params.__dict__)
 
         data = await self._data_from_cache(hash_, many=True)
         if not data:
-            data = await self._search_docs_in_elastic(query_body)
+            data = await self._search_in_db(params)
             if not data:
                 return None
             await self._put_data_to_cache(hash_, data)
 
         return data
 
-    async def _search_docs_in_elastic(self, query_body: dict) -> Optional[MODELS_TYPE]:
+    async def _search_in_db(self, params: PARAMS_TYPE) -> Optional[MODELS_TYPE]:
         try:
-            doc = await self.elastic.search(body=query_body, index=self.index)
+            doc = await self.db.search(index=self.index, params=params)
         except NotFoundError:
             return None
-        return self.models.parse_obj(self.parse_es_response(doc))
+        return self.models.parse_obj(doc)
 
-    async def _get_doc_from_elastic(self, id_: str) -> Optional[MODEL_TYPE]:
+    async def _get_from_db(self, id_: str) -> Optional[MODEL_TYPE]:
         try:
-            doc = await self.elastic.get(index=self.index, id=id_)
+            doc = await self.db.get(index=self.index, id_=id_)
         except NotFoundError:
             return None
         return self.model.parse_obj(doc['_source'])
@@ -72,7 +71,3 @@ class BaseService:
 
     async def _put_data_to_cache(self, key: str, current: Union[MODEL_TYPE, MODELS_TYPE]):
         await self.redis.set(key, current.json(), ex=CACHE_EXPIRE_IN_SECONDS)
-
-    @staticmethod
-    def parse_es_response(data):
-        return [record['_source'] for record in data['hits']['hits']]

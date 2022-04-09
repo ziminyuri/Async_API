@@ -2,7 +2,6 @@ import logging
 
 import aioredis
 import uvicorn as uvicorn
-from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
@@ -22,7 +21,7 @@ app = FastAPI(
 @app.on_event('startup')
 async def startup():
     redis.redis = await aioredis.from_url(f'{config.REDIS_HOST}:{config.REDIS_PORT}')
-    elastic.es = AsyncElasticsearch(f'{config.ELASTIC_HOST}:{config.ELASTIC_PORT}')
+    elastic.es = elastic.ElasticSearch(f'{config.ELASTIC_HOST}:{config.ELASTIC_PORT}')
 
 
 @app.on_event('shutdown')

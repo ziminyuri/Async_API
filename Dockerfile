@@ -2,7 +2,7 @@ FROM python:3.10-slim-buster
 
 WORKDIR /usr/src/app
 
-EXPOSE 80
+#EXPOSE 80
 
 COPY ./requirements.txt requirements.txt
 

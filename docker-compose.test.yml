@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  redis:
+    container_name: test-aioredis
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+  elasticsearch:
+    container_name: test-asynces
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    ports:
+      - '9200:9200'
+    depends_on:
+      - redis
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test-web-api
+
+    volumes:
+      - ./src/:/usr/src/app/
+    env_file:
+      - .env.test
+    depends_on:
+      - elasticsearch
+    ports:
+        - '8000:8000'
+
+  tests:
+    container_name: pytest-web-api
+    build:
+      context: .
+      dockerfile: tests/functional/Dockerfile
+    env_file:
+      - .env.test
+    entrypoint: >
+      sh -c "python3 tests/functional/utils/wait_for_es.py
+      && python3 tests/functional/utils/wait_for_redis.py
+      && pytest -v tests/functional/src "
+    depends_on:
+      - web

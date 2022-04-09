@@ -26,3 +26,6 @@
 
 ## ETL
 Актуальный проект ETL можно посмотреть по [ссылке](https://github.com/vokh-dima/new_admin_panel_sprint_3 "ссылка")
+
+## Документация
+[OpenAPI](http://0.0.0.0:8000/api/openapi#/ "Посмотреть")

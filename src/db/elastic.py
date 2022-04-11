@@ -23,8 +23,8 @@ class ElasticSearch(AbstractRepository):
         doc = await self._search(body=query_body, index=index)
         return self.parse_es_response(doc)
 
-    def close(self):
-        self.elastic.close()
+    async def close(self):
+        await self.elastic.close()
 
     @staticmethod
     def parse_es_response(data):

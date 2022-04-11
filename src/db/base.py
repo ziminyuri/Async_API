@@ -17,3 +17,19 @@ class AbstractRepository(ABC):
     @abstractmethod
     def close(self):
         pass
+
+
+class AbstractStorage(ABC):
+    """Абстрактный класс для кэширования данных"""
+
+    @abstractmethod
+    def get(self, key: str):
+        pass
+
+    @abstractmethod
+    def set(self, key: str, data):
+        pass
+
+    @abstractmethod
+    def close(self):
+        pass

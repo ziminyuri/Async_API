@@ -19,5 +19,5 @@ def get_genre_service(
         redis: Redis = Depends(get_redis),
         db: AbstractRepository = Depends(get_elastic)
 ) -> GenreService:
-    return GenreService(redis=redis, db=db,
+    return GenreService(cache=redis, db=db,
                         model=Genre, models=Genres, index='genres')

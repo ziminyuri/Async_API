@@ -1,4 +1,5 @@
 from functools import wraps
+from hashlib import sha256
 from time import sleep
 
 import orjson
@@ -44,3 +45,8 @@ def backoff(start_sleep_time=0.1, factor=2,
         return inner
 
     return func_wrapper
+
+
+def get_key_for_list(index, params):
+    key = f'{params}'.encode('utf-8')
+    return f'{index}_{str(sha256(key).hexdigest())}'

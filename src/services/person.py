@@ -19,5 +19,5 @@ def get_person_service(
         redis: Redis = Depends(get_redis),
         db: AbstractRepository = Depends(get_elastic)
 ) -> PersonService:
-    return PersonService(redis=redis, db=db,
+    return PersonService(cache=redis, db=db,
                          model=Person, models=Persons, index='persons')

@@ -34,7 +34,6 @@ services:
       - .env.prod
     depends_on:
       - elasticsearch
-      -
   nginx:
     build: ./nginx
     ports:

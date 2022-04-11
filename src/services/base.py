@@ -1,23 +1,20 @@
 from typing import Optional, Union
 
-from aioredis import Redis
 from elasticsearch.exceptions import NotFoundError
 
-from db.base import AbstractRepository
-from db.redis import get_key_for_list
+from db.base import AbstractRepository, AbstractStorage
 from models import Film, Films, Genre, Genres, Person, Persons
 from services.es_parser import PARAMS_TYPE
-
-CACHE_EXPIRE_IN_SECONDS = 60 * 5
+from src.helpers import get_key_for_list
 
 MODEL_TYPE = Union[Film, Person, Genre]
 MODELS_TYPE = Union[Films, Persons, Genres]
 
 
 class BaseService:
-    def __init__(self, redis: Redis, db: AbstractRepository,
+    def __init__(self, cache: AbstractStorage, db: AbstractRepository,
                  model: MODEL_TYPE, models: MODELS_TYPE, index: str):
-        self.redis = redis
+        self.cache = cache
         self.db = db
         self.model = model
         self.models = models
@@ -64,10 +61,10 @@ class BaseService:
     async def _data_from_cache(self,
                                key: str,
                                many=False) -> Optional[Union[MODEL_TYPE, MODELS_TYPE]]:
-        data = await self.redis.get(key)
+        data = await self.cache.get(key)
         if not data:
             return None
         return self.models.parse_raw(data) if many else self.model.parse_raw(data)
 
     async def _put_data_to_cache(self, key: str, current: Union[MODEL_TYPE, MODELS_TYPE]):
-        await self.redis.set(key, current.json(), ex=CACHE_EXPIRE_IN_SECONDS)
+        await self.cache.set(key, current)

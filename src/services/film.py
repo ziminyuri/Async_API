@@ -19,5 +19,5 @@ def get_film_service(
         redis: Redis = Depends(get_redis),
         db: AbstractRepository = Depends(get_elastic)
 ) -> FilmService:
-    return FilmService(redis=redis, db=db,
+    return FilmService(cache=redis, db=db,
                        model=Film, models=Films, index='movies')

@@ -1,6 +1,7 @@
+import logging
 import os
-import time
 
+import backoff
 from aioredis import ConnectionError, Redis
 
 REDIS_HOST = os.getenv('REDIS_HOST', '127.0.0.1')
@@ -8,12 +9,17 @@ REDIS_PORT = int(os.getenv('REDIS_PORT', 6389))
 
 r = Redis(host=REDIS_HOST, port=REDIS_PORT)
 
-is_connected = False
+logger = logging.getLogger()
 
-while not is_connected:
-    try:
-        is_connected = r.ping()
-        print('Redis connected.')
-    except ConnectionError:
-        print('Redis not connected, retry in 10 seconds...')
-        time.sleep(10)
+
+@backoff.on_exception(backoff.expo, ConnectionError, max_tries=20)
+def check_redis():
+    if not r.ping():
+        logger.info('Redis not connected, retry')
+        raise ConnectionError
+    else:
+        logger.info('Redis connected.')
+
+
+if __name__ == '__main__':
+    check_redis()

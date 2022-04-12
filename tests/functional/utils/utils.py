@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from http import HTTPStatus
 from typing import List
 
 from elasticsearch import AsyncElasticsearch
@@ -23,4 +24,5 @@ async def populate_es(es_client: AsyncElasticsearch,
 
 async def delete_es_index(es_client: AsyncElasticsearch, index: str = None):
     """Удаляем индекс из ES"""
-    await es_client.indices.delete(index=index, ignore=[400, 404])
+    await es_client.indices.delete(index=index,
+                                   ignore=[HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND])

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from api.v1.query_params import FilmSearchParams, FilmsParams
 from dictionary import errors_dict
+from grpc_client.dependencies import get_permissions
 from serializers.film import FilmDetail, Films
 from services.film import FilmService, get_film_service
 
@@ -32,7 +33,8 @@ async def film_search(params: FilmSearchParams = Depends(),
 
 @router.get('', response_model=Films)
 async def get_films(params: FilmsParams = Depends(),
-                    film_service: FilmService = Depends(get_film_service)) -> Films:
+                    film_service: FilmService = Depends(get_film_service),
+                    permissions=Depends(get_permissions)) -> Films:
     films = await film_service.get_by_params(params)
     if not (films and films.__root__):
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=errors_dict['404_films'])

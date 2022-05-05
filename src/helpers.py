@@ -1,8 +1,13 @@
 from functools import wraps
 from hashlib import sha256
+from http import HTTPStatus
 from time import sleep
+from typing import Optional
 
 import orjson
+from fastapi import Header, HTTPException
+
+from dictionary import errors_dict
 
 
 def orjson_dumps(v, *, default):
@@ -50,3 +55,10 @@ def backoff(start_sleep_time=0.1, factor=2,
 def get_key_for_list(index, params):
     key = f'{params}'.encode('utf-8')
     return f'{index}_{str(sha256(key).hexdigest())}'
+
+
+def get_auth_token(authorization: Optional[str] = Header(None)) -> str:
+    if authorization and 'Bearer' in authorization:
+        token = authorization.split(' ')[-1]
+        return token
+    raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=errors_dict['404_token'])

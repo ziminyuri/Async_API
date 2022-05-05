@@ -30,7 +30,7 @@ async def startup():
 async def shutdown():
     await redis.redis.close()
     await elastic.es.close()
-    client.channel.close()
+    await client.channel.close()
 
 
 app.include_router(film.router, prefix='/api/v1/films', tags=['film'])

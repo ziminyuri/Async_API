@@ -2,9 +2,10 @@ from typing import Optional
 
 import grpc
 
+from core import config
 from grpc_client.stubs import auth_pb2_grpc
 
-channel = grpc.insecure_channel('localhost:50051')
+channel = grpc.aio.insecure_channel(f'{config.GRPC_HOST}:{config.GRPC_PORT}')
 stub: Optional[auth_pb2_grpc.AuthStub] = None
 
 

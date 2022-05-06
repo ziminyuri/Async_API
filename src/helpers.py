@@ -1,6 +1,7 @@
 from functools import wraps
 from hashlib import sha256
 from http import HTTPStatus
+from pathlib import Path
 from time import sleep
 from typing import Optional
 
@@ -62,3 +63,15 @@ def get_auth_token(authorization: Optional[str] = Header(None)) -> str:
         token = authorization.split(' ')[-1]
         return token
     raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=errors_dict['404_token'])
+
+
+def get_credentials():
+    path = Path(__file__).parent
+    with open(path.joinpath('grpc_client/certificates/client.key'), 'rb') as f:
+        client_key = f.read()
+    with open(path.joinpath('grpc_client/certificates/client.pem'), 'rb') as f:
+        client_cert = f.read()
+    with open(path.joinpath('grpc_client/certificates/ca.pem'), 'rb') as f:
+        ca_cert = f.read()
+
+    return client_key, client_cert, ca_cert

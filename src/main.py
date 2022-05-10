@@ -8,6 +8,8 @@ from api.v1 import film, genre, person
 from core import config
 from core.logger import LOGGING
 from db import elastic, redis
+from grpc_client import client
+from grpc_client.stubs import auth_pb2_grpc
 
 app = FastAPI(
     title=config.PROJECT_NAME,
@@ -21,12 +23,14 @@ app = FastAPI(
 async def startup():
     redis.redis = await redis.RedisCache.connect(f'{config.REDIS_HOST}:{config.REDIS_PORT}')
     elastic.es = elastic.ElasticSearch(f'{config.ELASTIC_HOST}:{config.ELASTIC_PORT}')
+    client.stub = auth_pb2_grpc.AuthStub(client.channel)
 
 
 @app.on_event('shutdown')
 async def shutdown():
     await redis.redis.close()
     await elastic.es.close()
+    await client.channel.close()
 
 
 app.include_router(film.router, prefix='/api/v1/films', tags=['film'])

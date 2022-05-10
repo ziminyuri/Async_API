@@ -17,4 +17,7 @@ REDIS_PORT = int(os.getenv('REDIS_PORT'))
 ELASTIC_HOST = os.getenv('ELASTIC_HOST')
 ELASTIC_PORT = int(os.getenv('ELASTIC_PORT'))
 
+GRPC_HOST = os.getenv('GRPC_HOST')
+GRPC_PORT = os.getenv('GRPC_PORT')
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package gateway_backend;
+
+service Auth {
+  rpc GetPermissions (Token) returns (Permissions) {}
+
+  rpc GetRoles (Token) returns (Roles) {}
+
+  rpc IsAuthorized (Token) returns (IsValid) {}
+}
+
+message Permissions {
+  repeated string permissions = 1;
+}
+
+message Roles {
+  repeated string roles = 1;
+}
+
+message Token {
+  string token = 1;
+}
+
+message IsValid {
+  bool is_valid = 1;
+}
